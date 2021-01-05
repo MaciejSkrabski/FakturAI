@@ -4,6 +4,7 @@ import os
 
 
 class Firebase():
+    __instance = None
     firebaseConfig = {
         'apiKey': "AIzaSyDFxpIbMoz4oMhZByDpq_XqOoO4mjA9gKM",
         'authDomain': "inzynierka-ea1a4.firebaseapp.com",
@@ -15,15 +16,29 @@ class Firebase():
         'measurementId': "G-ZQFCSH3TER"}
 
     def __init__(self):
-        self.firebase = pyrebase.initialize_app(Firebase.firebaseConfig)
-        self.storage = self.firebase.storage()
+        '''artificially private constructor'''
+        if Firebase.__instance is not None:
+            raise Exception('SINGLETON REINITIALIZATION!'
+                            ' Please don\'t do that.')
+        else:
+            self.firebase = pyrebase.initialize_app(Firebase.firebaseConfig)
+            self.storage = self.firebase.storage()
+            Firebase.__instance = self
 
-    def __call__(self):
-        return self.firebase
+    @staticmethod
+    def getInstance():
+        if Firebase.__instance is None:
+            Firebase()
+        return Firebase.__instance
+
+    def get_img(self, storage_path, output_path):
+        pass
 
 
 if __name__ == '__main__':
-    storage = Firebase().storage
+    fb = Firebase.getInstance()
+    storage = fb.storage
+
     test_img_path = 'images/test/test[1].jpg'
     storage.child(test_img_path).download(
         os.path.join('images', 'test[1].jpg'))
