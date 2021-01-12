@@ -37,6 +37,7 @@ class Firebase():
 
 if __name__ == '__main__':
     fb = Firebase.getInstance()
+    fbarr = 3*[Firebase.getInstance()]
     storage = fb.storage
 
     test_img_path = 'images/test/test[1].jpg'
