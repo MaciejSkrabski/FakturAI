@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 
 images = np.asarray([os.path.join('data', file)
                      for file in os.listdir('data')
-                     if file[-4:] == '.png'])
+                     if file[-4:] in ('.png', '.jpg', '.bmp')])
 
 
 def load_images(size):

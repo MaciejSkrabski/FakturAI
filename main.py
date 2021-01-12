@@ -1,7 +1,7 @@
 # %%
 import numpy as np
+
 import pytesseract
-# import cv2
 import os
 from PIL import Image
 # import argparse
@@ -17,26 +17,43 @@ from image_manipulation import (
     )
 
 
-def tesseract_read(im):
+def tesseract_read(im, method='otsu'):
     grey = to_greyscale(np.asarray(im, dtype='float32'))/255
     plt_gray(grey)
     plt.show()
 
-    thresh = simple_thresh(grey, 'otsu')
-    print(thresh)
+    thresh = simple_thresh(grey, method)
 
     binarized = binarize(grey, thresh)
     plt_gray(binarized)
     plt.show()
 
-    text = pytesseract.image_to_string(binarized, lang='pol')
+    text = pytesseract.image_to_string(binarized, lang='pol').lower()
     return text
+
+
+def join_read(read_by_tesseract):
+    return('\n'.join(read_by_tesseract.lower().split()))
+
+
+def compare_methods(im):
+    print("UNPROCESSED", '\n',
+          join_read(pytesseract.image_to_string(im, lang='pol')))
+    for i in (
+        # 'median',
+        # 'mean',
+        'otsu',
+        # 'li',
+    ):
+        print('\t', i, '\n', join_read(tesseract_read(im, i)))
 
 
 if __name__ == '__main__':
     for im in load_images(15):
-        print(tesseract_read(im).split())
-    print('\n\n\n')
+        compare_methods(im)
+
+    print('\n===================\n')
+
     fb = Firebase.getInstance()
     fbarr = 3*[Firebase.getInstance()]
     storage = fb.storage
@@ -45,7 +62,5 @@ if __name__ == '__main__':
     output_path = os.path.join('images', 'test.jpg')
     storage.child(test_img_path).download(output_path)
     newim = Image.open(output_path)
-    plt_gray(newim)
-    plt.show()
-    tesseract_read(newim)
+    compare_methods(newim)
 # %%
