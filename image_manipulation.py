@@ -15,9 +15,8 @@ images = np.asarray([os.path.join('data', file)
 
 def load_images(size):
     chosen = np.random.choice(images, size=size, replace=False).tolist()
-    print(chosen)
-    fig = plt.figure(figsize=(8, 6))
-    columns = 4
+    fig = plt.figure(figsize=(4, 6))
+    columns = 3
     rows = 2
     data = []
     for i in range(1, columns*rows + 1):
@@ -28,7 +27,7 @@ def load_images(size):
         plt.imshow(im)
         plt.axis('off')
     plt.show()
-    return data  # return last image
+    return data
 
 
 def to_greyscale(image_array):
