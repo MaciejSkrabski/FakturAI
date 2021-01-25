@@ -1,38 +1,103 @@
 # %%
 import numpy as np
+import getpass
 import pytesseract
-import argparse
-import cv2
+import os
+from PIL import Image
+# import argparse
+import matplotlib as mpl
 from matplotlib import pyplot as plt
-
+from connectivity import Firebase
 from image_manipulation import (
     load_images,
     to_greyscale,
-    simple_thresh)
+    simple_thresh,
+    binarize,
+    plt_gray,
+    )
+from regular_expressions import RegularExpressions
+
+mpl.rcParams['figure.dpi'] = 300
+
+
+def tesseract_read(im, method='otsu', lang="pol", is_plot=False):
+    grey = to_greyscale(np.asarray(im, dtype='float32'))/255
+    thresh = simple_thresh(grey, method)
+    binarized = binarize(grey, thresh)
+    if is_plot:
+        plt_gray(grey)
+        plt.show()
+        plt_gray(binarized)
+        # plt.savefig(f'{method}.pdf')
+        plt.show()
+
+    text = pytesseract.image_to_string(binarized, lang=lang)
+    return text
+
+
+def print_found(read_by_tesseract):
+    re = RegularExpressions()
+    for exp in ('id', 'nips', 'dates', 'amount',):
+        found = list(set(re.get_match(read_by_tesseract, exp)))  # unique
+        if exp == 'amount' and found:
+            print(found)
+            value = max(list(map(float, [element.replace(',', '.')
+                                         for element in found])))
+            # ^ brutto, netto = brutto/1.23
+            found = value
+        print(exp, found)
+        # print('\n\n', read)
+
+
+def compare_methods(im):
+    for method in ('median', 'mean', 'otsu', 'li'):
+        print(3*'=========', '\n', method, '\n')
+        print_found(tesseract_read(im, method))
+    print("UNPROCESSED", '\n',
+          pytesseract.image_to_string(im, lang='pol'))
+
+
+if __name__ == '__main__':
+    # for im in load_images(15):
+    #     read = tesseract_read(im, 'otsu', is_plot=False)
+    #     print_found(read)
+
+    #     print('\n', 3*'=========', '\n')
+
+    fb = Firebase.getInstance()
+    storage = fb.storage
+    auth = fb.auth
+
+    filename = 'test.jpg'
+    password = getpass.getpass('Podaj hasło')
+    try:
+        user = auth.sign_in_with_email_and_password(
+            'tegoproszenieusuwac@test.pl',
+            password)
+        localid = auth.get_account_info(user['idToken'])['users'][0]['localId']
+
+        image_path = f'images/{localid}/{filename}'
+        output_path = os.path.join('images', filename)
+        storage.child(image_path).download(output_path, user['idToken'])
+        # storage.child(f'images/{localid}/test2.jpg').put(output_path,
+        #                                                  user['idToken'])
+    except Exception as e:
+        print(
+            "Nie można pobrać obrazu.",
+            "Upewnij się, że podajesz właściwe dane logowania,",
+            "właściwą nazwę obrazu",
+            "i że masz uprawnienia do tego folderu.",
+            e)
+    # try:
+    #     with Image.open(output_path) as newim:
+    #         compare_methods(newim)
+    # except Exception as e:
+    #     print(
+    #         "Nie można otworzyć obrazu.",
+    #         "Upewnij się, że obraz istnieje",
+    #         "i że masz uprawnienia do folderu w którym się znajduje.",
+    #         e)
+
 # %%
-for im in load_images(30):
-    print(im)
-    grey = to_greyscale(np.asarray(im, dtype='float32'))
-    thresh = simple_thresh(grey, (206, 255))[1]
 
-    # kernel
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (50, 1000))
-
-    # max value in kernel's region
-    dilation = cv2.convertScaleAbs(cv2.dilate(thresh, kernel, iterations=1))
-    contours, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL,
-                                   cv2.CHAIN_APPROX_NONE)
-    copied = np.array(im, copy=True)
-    for cont in contours:
-        x, y, w, h = cv2.boundingRect(cont)
-
-        # highlight region
-        draw = cv2.rectangle(copied, (x, y),
-                             (x + w, y + h),
-                             (180, 0, 0), 1)
-        # modyfying block before ocr
-        mod = copied[y: y + h, x: x + w]
-        text = pytesseract.image_to_string(mod, lang='pol')
-        print(text)
-
-
+# %%
