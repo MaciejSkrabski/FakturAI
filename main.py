@@ -1,6 +1,6 @@
 # %%
 import numpy as np
-
+import getpass
 import pytesseract
 import os
 from PIL import Image
@@ -28,14 +28,11 @@ def tesseract_read(im, method='otsu', lang="pol", is_plot=False):
         plt_gray(grey)
         plt.show()
         plt_gray(binarized)
+        # plt.savefig(f'{method}.pdf')
         plt.show()
 
     text = pytesseract.image_to_string(binarized, lang=lang)
     return text
-
-
-# def join_read(read_by_tesseract):
-#     return(''.join(read_by_tesseract.lower()))
 
 
 def print_found(read_by_tesseract):
@@ -46,6 +43,7 @@ def print_found(read_by_tesseract):
             print(found)
             value = max(list(map(float, [element.replace(',', '.')
                                          for element in found])))
+            # ^ brutto, netto = brutto/1.23
             found = value
         print(exp, found)
         # print('\n\n', read)
@@ -60,21 +58,46 @@ def compare_methods(im):
 
 
 if __name__ == '__main__':
-    for im in load_images(15):
-        read = tesseract_read(im, 'otsu', is_plot=False)
-        print_found(read)
+    # for im in load_images(15):
+    #     read = tesseract_read(im, 'otsu', is_plot=False)
+    #     print_found(read)
 
-        print('\n', 3*'=========', '\n')
+    #     print('\n', 3*'=========', '\n')
 
-    # fb = Firebase.getInstance()
-    # fbarr = 3*[Firebase.getInstance()]
-    # storage = fb.storage
+    fb = Firebase.getInstance()
+    storage = fb.storage
+    auth = fb.auth
 
-    # test_img_path = 'images/test/test[1].jpg'
-    # output_path = os.path.join('images', 'test.jpg')
-    # storage.child(test_img_path).download(output_path)
-    # newim = Image.open(output_path)
-    # compare_methods(newim)
+    filename = 'test.jpg'
+    password = getpass.getpass('Podaj hasło')
+    try:
+        user = auth.sign_in_with_email_and_password(
+            'tegoproszenieusuwac@test.pl',
+            password)
+        localid = auth.get_account_info(user['idToken'])['users'][0]['localId']
 
-    
+        image_path = f'images/{localid}/{filename}'
+        output_path = os.path.join('images', filename)
+        storage.child(image_path).download(output_path, user['idToken'])
+        # storage.child(f'images/{localid}/test2.jpg').put(output_path,
+        #                                                  user['idToken'])
+    except Exception as e:
+        print(
+            "Nie można pobrać obrazu.",
+            "Upewnij się, że podajesz właściwe dane logowania,",
+            "właściwą nazwę obrazu",
+            "i że masz uprawnienia do tego folderu.",
+            e)
+    # try:
+    #     with Image.open(output_path) as newim:
+    #         compare_methods(newim)
+    # except Exception as e:
+    #     print(
+    #         "Nie można otworzyć obrazu.",
+    #         "Upewnij się, że obraz istnieje",
+    #         "i że masz uprawnienia do folderu w którym się znajduje.",
+    #         e)
+
+# %%
+
 # %%

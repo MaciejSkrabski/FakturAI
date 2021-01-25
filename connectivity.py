@@ -23,6 +23,7 @@ class Firebase():
         else:
             self.firebase = pyrebase.initialize_app(Firebase.firebaseConfig)
             self.storage = self.firebase.storage()
+            self.auth = self.firebase.auth()
             Firebase.__instance = self
 
     @staticmethod
@@ -39,9 +40,14 @@ if __name__ == '__main__':
     fb = Firebase.getInstance()
     fbarr = 3*[Firebase.getInstance()]
     storage = fb.storage
+    auth = fb.auth
+    user = auth.sign_in_with_email_and_password('tegoproszenieusuwac@test.pl',
+                                                'yerbamate')
+    localid = auth.get_account_info(user['idToken'])['users'][0]['localId']
+    filename = 'test.jpg'
 
-    test_img_path = 'images/test/test[1].jpg'
-    storage.child(test_img_path).download(
-        os.path.join('images', 'test[1].jpg'))
+    # print(user)
 
+    image_path = f'images/{localid}/{filename}'
+    storage.child(image_path).download(os.path.join('images', filename))
 # %%
