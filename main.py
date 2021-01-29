@@ -1,15 +1,14 @@
 # %%
 import numpy as np
-import getpass
 import pytesseract
 import os
-from PIL import Image
+# from PIL import Image
 # import argparse
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from connectivity import Firebase
 from image_manipulation import (
-    load_images,
+    # load_images,
     to_greyscale,
     simple_thresh,
     binarize,
@@ -40,7 +39,6 @@ def print_found(read_by_tesseract):
     for exp in ('id', 'nips', 'dates', 'amount',):
         found = list(set(re.get_match(read_by_tesseract, exp)))  # unique
         if exp == 'amount' and found:
-            print(found)
             value = max(list(map(float, [element.replace(',', '.')
                                          for element in found])))
             # ^ brutto, netto = brutto/1.23
@@ -65,39 +63,7 @@ if __name__ == '__main__':
     #     print('\n', 3*'=========', '\n')
 
     fb = Firebase.getInstance()
-    storage = fb.storage
-    auth = fb.auth
+    fb.login('tegoproszenieusuwać@test.pl')
 
     filename = 'test.jpg'
-    password = getpass.getpass('Podaj hasło')
-    try:
-        user = auth.sign_in_with_email_and_password(
-            'tegoproszenieusuwac@test.pl',
-            password)
-        localid = auth.get_account_info(user['idToken'])['users'][0]['localId']
-
-        image_path = f'images/{localid}/{filename}'
-        output_path = os.path.join('images', filename)
-        storage.child(image_path).download(output_path, user['idToken'])
-        # storage.child(f'images/{localid}/test2.jpg').put(output_path,
-        #                                                  user['idToken'])
-    except Exception as e:
-        print(
-            "Nie można pobrać obrazu.",
-            "Upewnij się, że podajesz właściwe dane logowania,",
-            "właściwą nazwę obrazu",
-            "i że masz uprawnienia do tego folderu.",
-            e)
-    # try:
-    #     with Image.open(output_path) as newim:
-    #         compare_methods(newim)
-    # except Exception as e:
-    #     print(
-    #         "Nie można otworzyć obrazu.",
-    #         "Upewnij się, że obraz istnieje",
-    #         "i że masz uprawnienia do folderu w którym się znajduje.",
-    #         e)
-
-# %%
-
-# %%
+    fb.get_img(filename, 'out/testowy.jpg')

@@ -2,7 +2,7 @@
 import re
 
 
-class RegularExpressions():
+class RegularExpressions:
     '''
     Class for storing regular expressions as fields with methods
     returning found matches.
@@ -30,16 +30,28 @@ class RegularExpressions():
         if expression not in self.regex:
             raise Exception('Szukasz złego pola')
 
-        found = []
         compiled = re.compile(self.regex[expression])
-        found.extend(compiled.findall(text))
-        return found
+        if expression in ['id', 'dates']:
+            found = compiled.search(text)
+            if found:
+                return found.group(0)
+
+        found = compiled.findall(text)
+
+        if found:
+            if expression == 'nips':
+                return list(set(found))[:2]
+            elif expression == 'amount':
+                return max(list(map(float, [element.replace(',', '.')
+                                            for element in found])))
+        return None
 
 
 if __name__ == '__main__':
     exp = RegularExpressions()
     print(exp.get_match("haba 23,54 31.37 4baba", "amount"))
-    print(exp.get_match('nip 972-086-54-31 zera 8374910024', 'nips'))
+    print(exp.get_match('nip  8374910024 972-086-54-31 zera 111-111-11-11',
+                        'nips'))
     print(exp.get_match('gfhf 022245-19-0550W ogdr74735746 1234567890123 hry '
                         '123456-2021-123 othfo 1234/H/123/20', 'id'))
 # %%

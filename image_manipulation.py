@@ -8,13 +8,13 @@ from PIL import Image
 from skimage import filters
 from matplotlib import pyplot as plt
 
-images = np.asarray([os.path.join('data', file)
-                     for file in os.listdir('data')
+images = np.asarray([os.path.join('images', file)
+                     for file in os.listdir('images')
                      if file[-4:] in ('.png', '.jpg', '.bmp')])
 
 
 def load_images(size):
-    chosen = np.random.choice(images, size=size, replace=False).tolist()
+    chosen = np.random.choice(images, size=size, replace=True).tolist()
     fig = plt.figure(figsize=(4, 6))
     columns = 3
     rows = 2
