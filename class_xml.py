@@ -58,41 +58,41 @@ class Invoice:
                   'Upewnij się że podana ścieżka jest prawidłowa.\n', oserror)
 
     def to_xml_item(self):
-        return f'''<Faktura>
-  <KodWaluty>PLN</KodWaluty>
-  <P_1>{self.if_exists(self.date)}</P_1>
-  <P_2A>{self.if_exists(self.id)}</P_2A>
-  <P_3A>false</P_3A>
-  <P_3B>false</P_3B>
-  <P_3C>false</P_3C>
-  <P_3D>false</P_3D>
-  <P_4B>{self.if_exists(self.station_nip)}</P_4B>
-  <P_5B>{self.if_exists(self.company_nip)}</P_5B>
-  <P_13_1>{self.if_exists(self.before_tax)}</P_13_1>
-  <P_14_1>{self.if_exists(self.tax)}</P_14_1>
-  <P_14_1W>{self.if_exists(self.tax)}</P_14_1W>
-  <P_13_2>0.00</P_13_2>
-  <P_14_2>0.00</P_14_2>
-  <P_14_2W>0.00</P_14_2W>
-  <P_13_3>0.00</P_13_3>
-  <P_14_3>0.00</P_14_3>
-  <P_14_3W>0.00</P_14_3W>
-  <P_13_6>0.00</P_13_6>
-  <P_13_7>0.00</P_13_7>
-  <P_15>{self.if_exists(self.amount)}</P_15>
-  <P_16>false</P_16>
-  <P_17>false</P_17>
-  <P_18>false</P_18>
-  <P_18A>false</P_18A>
-  <P_19>false</P_19>
-  <P_20>false</P_20>
-  <P_21>false</P_21>
-  <P_22>false</P_22>
-  <P_23>false</P_23>
-  <P_106E_2>false</P_106E_2>
-  <P_106E_3>false</P_106E_3>
-  <RodzajFaktury>VAT</RodzajFaktury>
-</Faktura>'''
+        return ('<Faktura>\n'
+                '  <KodWaluty>PLN</KodWaluty>\n'
+                f'  <P_1>{self.if_exists(self.date)}</P_1>\n'
+                f'  <P_2A>{self.if_exists(self.id)}</P_2A>\n'
+                # '  <P_3A>false</P_3A>\n'
+                # '  <P_3B>false</P_3B>\n'
+                # '  <P_3C>false</P_3C>\n'
+                # '  <P_3D>false</P_3D>\n'
+                f'  <P_4B>{self.if_exists(self.station_nip)}</P_4B>\n'
+                f'  <P_5B>{self.if_exists(self.company_nip)}</P_5B>\n'
+                # '  <P_13_1>{self.if_exists(self.before_tax)}</P_13_1>\n'
+                # '  <P_14_1>{self.if_exists(self.tax)}</P_14_1>\n'
+                # '  <P_14_1W>{self.if_exists(self.tax)}</P_14_1W>\n'
+                # '  <P_13_2>0.00</P_13_2>\n'
+                # '  <P_14_2>0.00</P_14_2>\n'
+                # '  <P_14_2W>0.00</P_14_2W>\n'
+                # '  <P_13_3>0.00</P_13_3>\n'
+                # '  <P_14_3>0.00</P_14_3>\n'
+                # '  <P_14_3W>0.00</P_14_3W>\n'
+                # '  <P_13_6>0.00</P_13_6>\n'
+                # '  <P_13_7>0.00</P_13_7>\n'
+                f'  <P_15>{self.if_exists(self.amount)}</P_15>\n'
+                # '  <P_16>false</P_16>\n'
+                # '  <P_17>false</P_17>\n'
+                # '  <P_18>false</P_18>\n'
+                # '  <P_18A>false</P_18A>\n'
+                # '  <P_19>false</P_19>\n'
+                # '  <P_20>false</P_20>\n'
+                # '  <P_21>false</P_21>\n'
+                # '  <P_22>false</P_22>\n'
+                # '  <P_23>false</P_23>\n'
+                # '  <P_106E_2>false</P_106E_2>\n'
+                # '  <P_106E_3>false</P_106E_3>\n'
+                # '  <RodzajFaktury>VAT</RodzajFaktury>\n'
+                '</Faktura>')
 
 
 if __name__ == '__main__':
