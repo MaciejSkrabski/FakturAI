@@ -55,7 +55,7 @@ if __name__ == '__main__':
     parser.add_argument('--rysuj', '-r', action='store_true',
                         help="Użycie spowoduje rysowanie obrazków."
                              "Dobry sposób na porównanie jakości"
-                             "progowania z argumentu -p")
+                             " progowania z argumentu -p")
     parser.add_argument('--progowanie', '-p', type=str, default='otsu',
                         choices=['srednia', 'mediana', 'li', 'otsu'],
                         help='Określa metodę progowania.'

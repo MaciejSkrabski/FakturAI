@@ -1,5 +1,7 @@
 # %%
-from os import path
+string = 'haba/baba.txt'
+# %%
+from os import path, mkdir
 
 
 class Invoice:
@@ -38,7 +40,13 @@ class Invoice:
 
     def to_file(self, name):
         try:
-            name = path.splitext(name)[0].strip() + '.xml'
+            base = path.splitext(name)[0].strip()
+            if path.basename(base) == '':
+                raise OSError('Podaj pełną ścieżkę razem z nazwą pliku')
+            dirname = path.dirname(base)
+            if not path.isdir(dirname):
+                mkdir(dirname)
+            name = base + '.xml'
             with open(name, 'w') as file:
                 file.write(self.to_xml_item())
         except IOError as ioerror:
