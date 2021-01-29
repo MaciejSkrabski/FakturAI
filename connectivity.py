@@ -1,6 +1,9 @@
 # %%
 import pyrebase
-import os
+from os import path, mkdir
+from getpass import getpass
+# %%
+# %%
 
 
 class Firebase():
@@ -24,6 +27,8 @@ class Firebase():
             self.firebase = pyrebase.initialize_app(Firebase.firebaseConfig)
             self.storage = self.firebase.storage()
             self.auth = self.firebase.auth()
+            self._user = None
+
             Firebase.__instance = self
 
     @staticmethod
@@ -32,22 +37,50 @@ class Firebase():
             Firebase()
         return Firebase.__instance
 
-    def get_img(self, storage_path, output_path):
-        pass
+    def login(self, email):
+        password = getpass(f'Proszę podać hasło dla konta {email}'
+                           ' i potwierdzić klawiszem ENTER:')
+        try:
+            user = self.auth.sign_in_with_email_and_password(email, password)
+            self._user = self.auth.get_account_info(
+                user['idToken'])['users'][0]['localId']
+        except Exception as e:
+            print("Błąd logowania. Upewnij się, że podajesz właściwe dane",
+                  "oraz że nawiązanie połączenia jest możliwe.",
+                  e)
+
+    def get_img(self, image_name, output_path):
+        if self._user is None:
+            raise Exception("Użytkownik niezalogowany."
+                            " Niemożliwe dalsze działanie.")
+
+        image_ext = path.splitext(image_name)[1].strip().lower()
+        if path.splitext(output_path)[1].strip().lower() != image_ext:
+            output_path = output_path.strip() + image_ext
+
+        directory = path.dirname(output_path)
+        try:
+            if not path.exists(directory):
+                mkdir(directory)
+            image_path = f'images/{self._user}/{image_name}'
+            self.storage.child(image_path).download(output_path)
+        except OSError as oserror:
+            print("Błąd biblioteki OSError. Upewnij się, że masz"
+                  " uprawnienia do tej ścieżki.\n"
+                  f"{oserror}")
+        except IOError as ioerror:
+            print("IOERROR Błąd przy tworzeniu ścieżki zapisu obrazka.",
+                  "Upewnij się, że podajesz właściwą ścieżkę i że",
+                  "masz uprawnienia dostępu do niej.\n"
+                  f"{ioerror}")
+
+    
 
 
 if __name__ == '__main__':
     fb = Firebase.getInstance()
-    fbarr = 3*[Firebase.getInstance()]
-    storage = fb.storage
-    auth = fb.auth
-    user = auth.sign_in_with_email_and_password('tegoproszenieusuwac@test.pl',
-                                                'yerbamate')
-    localid = auth.get_account_info(user['idToken'])['users'][0]['localId']
+    fb.login('tegoproszenieusuwac@test.pl')
     filename = 'test.jpg'
-
-    # print(user)
-
-    image_path = f'images/{localid}/{filename}'
-    storage.child(image_path).download(os.path.join('images', filename))
+    fb.get_img(filename, 'out/testowy.jpg')
+    fb.get_img(filename, '/home/malbik/to/jest/???/zła/;,.,.<>[]/ścieżka.jpg')
 # %%

@@ -1,40 +1,24 @@
 # %%
 
 # %%
-# import cv2
-import os
 import numpy as np
 from PIL import Image
 from skimage import filters
 from matplotlib import pyplot as plt
 
-images = np.asarray([os.path.join('data', file)
-                     for file in os.listdir('data')
-                     if file[-4:] in ('.png', '.jpg', '.bmp')])
 
+def open_image(im_path):
+    try:
+        im = Image.open(im_path)
+        data = np.asarray(im)
+        return data
 
-def load_images(size):
-    chosen = np.random.choice(images, size=size, replace=False).tolist()
-    fig = plt.figure(figsize=(4, 6))
-    columns = 3
-    rows = 2
-    data = []
-    for i in range(1, columns*rows + 1):
-        # img = np.random.randint(8, size=(h, w))
-        fig.add_subplot(rows, columns, i)
-        im = Image.open(chosen[i-1])
-        data.append(im)
-        plt.imshow(im)
-        plt.axis('off')
-    plt.show()
-    return data
+    except Exception as e:
+        print('Nie można otworzyć pliku.\n', e)
 
 
 def to_greyscale(image_array):
-    # gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
     return np.dot(image_array[..., :3], [0.2989, 0.5870, 0.1140])
-
-# ret,thresh1 = cv.threshold(img,127,255,cv.THRESH_BINARY)
 
 
 def binarize(image_array, value):
@@ -60,7 +44,8 @@ def plt_gray(image):
 
 
 if __name__ == '__main__':
-    image = to_greyscale(np.asarray(load_images(15)[-1], dtype='float32')/255)
+    image = open_image('out/testow.jpg')
+    image = to_greyscale(image)
     plt_gray(image)
     plt.show()
 
