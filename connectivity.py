@@ -49,19 +49,15 @@ class Firebase():
                   "oraz że nawiązanie połączenia jest możliwe.",
                   e)
 
-    def get_img(self, image_name, output_path):
+    def get_img(self, image_name):
         if self._user is None:
             raise Exception("Użytkownik niezalogowany."
                             " Niemożliwe dalsze działanie.")
 
-        image_ext = path.splitext(image_name)[1].strip().lower()
-        if path.splitext(output_path)[1].strip().lower() != image_ext:
-            output_path = output_path.strip() + image_ext
-
-        directory = path.dirname(output_path)
+        output_path = path.join('pobrane', image_name)
         try:
-            if not path.exists(directory):
-                mkdir(directory)
+            if not path.exists('pobrane'):
+                mkdir('pobrane')
             image_path = f'images/{self._user}/{image_name}'
             self.storage.child(image_path).download(output_path)
         except OSError as oserror:

@@ -14,7 +14,8 @@ def open_image(im_path):
         return data
 
     except Exception as e:
-        print('Nie można otworzyć pliku.\n', e)
+        print('Nie można otworzyć pliku. Upewnij się, że plik istnieje',
+              'oraz że podana ścieżka jest prawidłowa.\n', e)
 
 
 def to_greyscale(image_array):
