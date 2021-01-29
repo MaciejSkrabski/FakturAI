@@ -2,28 +2,33 @@
 from os import path
 
 
-class XML:
+class Invoice:
     def __init__(self):
         self.id = False
         self.date = False
-        self.amount = False
+        self._amount = False
         self.tax = False
         self.before_tax = False
         self.company_nip = False
         self.station_nip = False
+
+    @property
+    def amount(self):
+        return self._amount
+
+    @amount.setter
+    def amount(self, value):
+        if value:
+            self._amount = self.to_locale(value)
+            no_tax = round(value / 1.23, 2)
+            self.before_tax = self.to_locale(no_tax)
+            self.tax = self.to_locale(value - no_tax)
 
     def if_exists(self, value):
         return value if value else 'false'
 
     def to_locale(self, floating_point_number):
         return "{:.2f}".format(round(floating_point_number, 2))
-
-    def set_numericals(self, value):
-        if value:
-            self.amount = self.to_locale(value)
-            no_tax = round(value / 1.23, 2)
-            self.before_tax = self.to_locale(no_tax)
-            self.tax = self.to_locale(value - no_tax)
 
     def set_nips(self, nips):
         if nips:
@@ -83,10 +88,11 @@ class XML:
 
 
 if __name__ == '__main__':
-    xml = XML()
+    xml = Invoice()
     print(xml.to_xml_item())
-    xml.set_numericals(123)
-    print(xml.to_xml_item())
-    xml.to_file('testowy_xml')
+    xml.amount = 12.3
+    xml.date = '1997-04-03'
+    xml.set_nips(['111-111-11-11', '222-222-22-22'])
+    xml.to_file('try_me')
 
 # %%

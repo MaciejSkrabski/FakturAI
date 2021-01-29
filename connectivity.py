@@ -27,7 +27,7 @@ class Firebase():
             self.firebase = pyrebase.initialize_app(Firebase.firebaseConfig)
             self.storage = self.firebase.storage()
             self.auth = self.firebase.auth()
-            self.user = None
+            self._user = None
 
             Firebase.__instance = self
 
@@ -59,7 +59,6 @@ class Firebase():
             output_path = output_path.strip() + image_ext
 
         directory = path.dirname(output_path)
-        print('base_path', directory)
         try:
             if not path.exists(directory):
                 mkdir(directory)
